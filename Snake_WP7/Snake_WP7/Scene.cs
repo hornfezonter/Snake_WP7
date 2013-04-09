@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Input.Touch;
 using Snake.Sprites;
 
 using System.Diagnostics;
@@ -25,6 +26,7 @@ namespace Snake
 
         protected int finish;//0为进行中，1为失败，2为胜利
 
+        //保存的图片
         protected SpriteBatch spriteBatch;
         protected Texture2D img_background;
         protected Texture2D img_food;
@@ -33,6 +35,7 @@ namespace Snake
         protected Texture2D img_cornerBody;
         protected Texture2D img_tail;
 
+        //游戏进行时使用变量
         protected Contain[,] contains;
         protected bool[,] growPoints;
         protected Snake.Sprites.Snake player;
@@ -44,10 +47,17 @@ namespace Snake
 
         protected Random rand;
 
+        //游戏可调整参数
         protected int timePerMove;
         protected int timeSinceLastMove;
         protected int sceneWidth;
         protected int sceneHeight;
+
+        //按钮
+        protected Button up;
+        protected Button down;
+        protected Button left;
+        protected Button right;
 
         #endregion
 
@@ -80,6 +90,8 @@ namespace Snake
             img_tail = Game.Content.Load<Texture2D>(@"images/tail");
             img_food = Game.Content.Load<Texture2D>(@"images/objects/meat");
             Texture2D img_wall = Game.Content.Load<Texture2D>(@"images/objects/wall");
+
+            #region 填充场景
 
             contains = new Contain[sceneWidth, sceneHeight];
             growPoints = new bool[sceneWidth, sceneHeight];
@@ -116,6 +128,9 @@ namespace Snake
                 contains[sceneWidth - 1, i] = Contain.stone;
             }
 
+            #endregion
+
+            #region 初始化蛇的位置
             player = new Snake.Sprites.Snake(origin, new Point(3, 3), img_head, img_straightBody, img_cornerBody, img_tail);
             contains[3, 3] = Contain.snake;
             contains[3, 4] = Contain.snake;
@@ -130,6 +145,20 @@ namespace Snake
             contains[10, 10] = Contain.snake;
             contains[10, 11] = Contain.snake;
             contains[10, 12] = Contain.snake;
+            #endregion
+
+            #region 初始化4个控制按钮
+            Texture2D img_up = Game.Content.Load<Texture2D>(@"images/buttons/up");
+            Texture2D img_down = Game.Content.Load<Texture2D>(@"images/buttons/down");
+            Texture2D img_left = Game.Content.Load<Texture2D>(@"images/buttons/left");
+            Texture2D img_right = Game.Content.Load<Texture2D>(@"images/buttons/right");
+
+            up = new Button(new Vector2(190, 600), img_up, img_up);
+            down = new Button(new Vector2(190, 750f), img_down, img_down);
+            left = new Button(new Vector2(140, 650), img_left, img_left);
+            right = new Button(new Vector2(290, 650), img_right, img_right);
+
+            #endregion
 
             base.LoadContent();
         }
@@ -247,15 +276,32 @@ namespace Snake
             }
             #endregion
 
-            KeyboardState key = Keyboard.GetState();
-            if (key.IsKeyDown(Keys.W) || key.IsKeyDown(Keys.Up))
-                player.turn(Direction.Up);
-            else if (key.IsKeyDown(Keys.S) || key.IsKeyDown(Keys.Down))
-                player.turn(Direction.Down);
-            else if (key.IsKeyDown(Keys.A) || key.IsKeyDown(Keys.Left))
-                player.turn(Direction.Left);
-            else if (key.IsKeyDown(Keys.D) || key.IsKeyDown(Keys.Right))
-                player.turn(Direction.Right);
+            #region player_control
+            TouchCollection touchs = TouchPanel.GetState();
+            if (touchs.Count > 0)
+            {
+                if (up.CheckPoint(touchs[0].Position))
+                {
+                    player.turn(Direction.Up);
+                    Debug.WriteLine("up");
+                }
+                else if (down.CheckPoint(touchs[0].Position))
+                {
+                    player.turn(Direction.Down);
+                    Debug.WriteLine("down");
+                }
+                else if (left.CheckPoint(touchs[0].Position))
+                {
+                    player.turn(Direction.Left);
+                    Debug.WriteLine("left");
+                }
+                else if (right.CheckPoint(touchs[0].Position))
+                {
+                    Debug.WriteLine("right");
+                    player.turn(Direction.Right);
+                }
+            }
+            #endregion
 
             Point AIHead = AI.HeadPosition;
             if (contains[AIHead.X - 1, AIHead.Y] == Contain.empty || contains[AIHead.X - 1, AIHead.Y] == Contain.food)
@@ -292,6 +338,11 @@ namespace Snake
             {
                 f.Draw(gameTime, spriteBatch);
             }
+
+            up.Draw(gameTime, spriteBatch);
+            down.Draw(gameTime, spriteBatch);
+            left.Draw(gameTime, spriteBatch);
+            right.Draw(gameTime, spriteBatch);
             
             base.Draw(gameTime);
         }

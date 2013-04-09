@@ -69,7 +69,7 @@ namespace Snake.Sprites
 
         public bool CheckPoint(Vector2 point)
         {
-            if (point.X > position.X && point.X < point.X + width && point.Y > position.Y && point.Y < point.Y + height)
+            if (point.X > position.X && point.X < position.X + width && point.Y > position.Y && point.Y < position.Y + height)
             {
                 pushed = true;
                 return true;
