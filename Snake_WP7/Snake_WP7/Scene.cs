@@ -113,7 +113,7 @@ namespace Snake
             {
                 Stone stone = new Stone(img_wall, origin, new Point(i, sceneHeight-1));
                 stones.Add(stone);
-                contains[i, sceneWidth - 1] = Contain.stone;
+                contains[i, sceneHeight - 1] = Contain.stone;
             }
             for (int i = 1; i < sceneHeight - 1; i++)
             {
@@ -251,7 +251,7 @@ namespace Snake
                 }
                 else
                 {
-                    //((Game1)Game).currentState = Game1.GameState.loose;
+                    ((Game1)Game).currentState = Game1.GameState.loose;
                 }
                 #endregion
 
@@ -283,21 +283,17 @@ namespace Snake
                 if (up.CheckPoint(touchs[0].Position))
                 {
                     player.turn(Direction.Up);
-                    Debug.WriteLine("up");
                 }
                 else if (down.CheckPoint(touchs[0].Position))
                 {
                     player.turn(Direction.Down);
-                    Debug.WriteLine("down");
                 }
                 else if (left.CheckPoint(touchs[0].Position))
                 {
                     player.turn(Direction.Left);
-                    Debug.WriteLine("left");
                 }
                 else if (right.CheckPoint(touchs[0].Position))
                 {
-                    Debug.WriteLine("right");
                     player.turn(Direction.Right);
                 }
             }
