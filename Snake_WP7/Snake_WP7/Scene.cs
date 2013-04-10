@@ -56,6 +56,8 @@ namespace Snake
         protected int timeSinceLastMove;
         protected int sceneWidth;
         protected int sceneHeight;
+        protected int time;
+        protected int timeSinceLastSecond;
 
         #endregion
 
@@ -76,6 +78,8 @@ namespace Snake
 
             sceneHeight = 20;
             sceneWidth = 27;
+            time = 300;
+            timeSinceLastSecond = 0;
         }
 
         public override void Initialize()
@@ -162,6 +166,17 @@ namespace Snake
                 i.Update(gameTime);
             foreach (Food f in foods)
                 f.Update(gameTime);
+
+            timeSinceLastSecond += gameTime.ElapsedGameTime.Milliseconds;
+            if (timeSinceLastSecond >= 1000)
+            {
+                timeSinceLastSecond -= 1000;
+                time--;
+                if (time == 0)
+                {
+                    ((Game1)Game).currentState = Game1.GameState.lose;
+                }
+            }
 
             timeSinceLastMove += gameTime.ElapsedGameTime.Milliseconds;
             if (timeSinceLastMove >= timePerMove)
@@ -316,6 +331,8 @@ namespace Snake
             spriteBatch.DrawString(font,""+ score_player, new Vector2(660, 60), Color.Red);
             spriteBatch.DrawString(font, "AI", new Vector2(660, 220), Color.White);
             spriteBatch.DrawString(font, ""+score_AI, new Vector2(660, 260), Color.Red);
+            spriteBatch.DrawString(font, "TIME", new Vector2(660,320), Color.White);
+            spriteBatch.DrawString(font, ""+time, new Vector2(660,360), Color.Green);
             spriteBatch.End();
 
             player.Draw(gameTime, spriteBatch);
