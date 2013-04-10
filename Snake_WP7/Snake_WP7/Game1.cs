@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Media;
 
 using System.Diagnostics;
@@ -43,8 +44,8 @@ namespace Snake
             // 延长锁定时的电池寿命。
             InactiveSleepTime = TimeSpan.FromSeconds(1);
 
-            graphics.PreferredBackBufferHeight = 800;
-            graphics.PreferredBackBufferWidth = 480;
+            graphics.PreferredBackBufferHeight = 480;
+            graphics.PreferredBackBufferWidth = 800;
             IsMouseVisible = true;
         }
 
@@ -57,6 +58,8 @@ namespace Snake
         protected override void Initialize()
         {
             // TODO: 在此处添加初始化逻辑
+            TouchPanel.EnabledGestures = GestureType.VerticalDrag | GestureType.HorizontalDrag;
+
             currentState = GameState.main_menu;
             preState = GameState.main_menu;
 

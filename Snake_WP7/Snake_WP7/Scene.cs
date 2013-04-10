@@ -71,8 +71,8 @@ namespace Snake
             timeSinceLastMove = 0;
             rand = new Random();
 
-            sceneHeight = 25;
-            sceneWidth = 20;
+            sceneHeight = 20;
+            sceneWidth = 27;
         }
 
         public override void Initialize()
@@ -277,24 +277,33 @@ namespace Snake
             #endregion
 
             #region player_control
-            TouchCollection touchs = TouchPanel.GetState();
-            if (touchs.Count > 0)
+            if (TouchPanel.IsGestureAvailable)
             {
-                if (up.CheckPoint(touchs[0].Position))
+                GestureSample gesture = TouchPanel.ReadGesture();
+                switch (gesture.GestureType)
                 {
-                    player.turn(Direction.Up);
-                }
-                else if (down.CheckPoint(touchs[0].Position))
-                {
-                    player.turn(Direction.Down);
-                }
-                else if (left.CheckPoint(touchs[0].Position))
-                {
-                    player.turn(Direction.Left);
-                }
-                else if (right.CheckPoint(touchs[0].Position))
-                {
-                    player.turn(Direction.Right);
+                    case GestureType.HorizontalDrag:
+                        if (gesture.Delta.X > 0)
+                        {
+                            player.turn(Direction.Right);
+                        }
+                        else if (gesture.Delta.X < 0)
+                        {
+                            player.turn(Direction.Left);
+                        }
+                        break;
+                    case GestureType.VerticalDrag:
+                        if (gesture.Delta.Y > 0)
+                        {
+                            player.turn(Direction.Down);
+                        }
+                        else if (gesture.Delta.Y < 0)
+                        {
+                            player.turn(Direction.Up);
+                        }
+                        break;
+                    default:
+                        break;
                 }
             }
             #endregion
