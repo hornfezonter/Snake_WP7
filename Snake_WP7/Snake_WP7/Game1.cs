@@ -27,7 +27,7 @@ namespace Snake
             main_menu,
             playing,
             win,
-            loose
+            lose
         };
 
         public GameState currentState;
@@ -121,11 +121,11 @@ namespace Snake
                         scene.Initialize();
                         Components.Add(scene);
                         break;
-                    case GameState.loose:
+                    case GameState.lose:
                         Components.Clear();
-                        Loose loose = new Loose(this);
-                        loose.Initialize();
-                        Components.Add(loose);
+                        Lose lose = new Lose(this);
+                        lose.Initialize();
+                        Components.Add(lose);
                         break;
                     case GameState.win:
                         Components.Clear();

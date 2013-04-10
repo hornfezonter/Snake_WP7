@@ -44,6 +44,7 @@ namespace Snake
         protected List<Stone> stones;
         protected List<Food> foods;
         protected bool food_eaten;
+        protected Point food_position;
 
         protected Random rand;
 
@@ -53,12 +54,6 @@ namespace Snake
         protected int sceneWidth;
         protected int sceneHeight;
 
-        //按钮
-        protected Button up;
-        protected Button down;
-        protected Button left;
-        protected Button right;
-
         #endregion
 
         public Scene(Game game)
@@ -67,6 +62,8 @@ namespace Snake
             origin = new Vector2(12, 12);
             stones = new List<Stone>();
             foods = new List<Food>();
+            food_position = new Point(1, 1);
+            food_eaten = true;
             timePerMove = 300;
             timeSinceLastMove = 0;
             rand = new Random();
@@ -89,6 +86,7 @@ namespace Snake
             img_cornerBody = Game.Content.Load<Texture2D>(@"images/cornerBody");
             img_tail = Game.Content.Load<Texture2D>(@"images/tail");
             img_food = Game.Content.Load<Texture2D>(@"images/objects/meat");
+            img_background = Game.Content.Load<Texture2D>(@"images/background");
             Texture2D img_wall = Game.Content.Load<Texture2D>(@"images/objects/wall");
 
             #region 填充场景
@@ -145,19 +143,6 @@ namespace Snake
             contains[10, 10] = Contain.snake;
             contains[10, 11] = Contain.snake;
             contains[10, 12] = Contain.snake;
-            #endregion
-
-            #region 初始化4个控制按钮
-            Texture2D img_up = Game.Content.Load<Texture2D>(@"images/buttons/up");
-            Texture2D img_down = Game.Content.Load<Texture2D>(@"images/buttons/down");
-            Texture2D img_left = Game.Content.Load<Texture2D>(@"images/buttons/left");
-            Texture2D img_right = Game.Content.Load<Texture2D>(@"images/buttons/right");
-
-            up = new Button(new Vector2(190, 600), img_up, img_up);
-            down = new Button(new Vector2(190, 750f), img_down, img_down);
-            left = new Button(new Vector2(140, 650), img_left, img_left);
-            right = new Button(new Vector2(290, 650), img_right, img_right);
-
             #endregion
 
             base.LoadContent();
@@ -251,30 +236,33 @@ namespace Snake
                 }
                 else
                 {
-                    ((Game1)Game).currentState = Game1.GameState.loose;
+                    //((Game1)Game).currentState = Game1.GameState.lose;
                 }
                 #endregion
 
-            }
+                #region generate food
 
-            #region generate food
-
-            if (food_eaten)
-            {
-                for (; ; )
+                if (food_eaten)
                 {
-                    int roll = rand.Next(0, 400);
-
-                    if (contains[roll%sceneWidth, roll/sceneWidth] == Contain.empty)
+                    for (; ; )
                     {
-                        contains[roll%sceneWidth, roll/sceneWidth] = Contain.food;
-                        foods.Add(new Food(img_food, origin, new Point(roll%sceneWidth, roll/sceneWidth)));
-                        food_eaten = false;
-                        break;
-                    }                 
+                        int roll = rand.Next(0, 400);
+
+                        if (contains[roll % sceneWidth, roll / sceneWidth] == Contain.empty)
+                        {
+                            contains[roll % sceneWidth, roll / sceneWidth] = Contain.food;
+                            food_position.X = roll % sceneWidth;
+                            food_position.Y = roll / sceneWidth;
+                            foods.Add(new Food(img_food, origin, food_position));
+                            food_eaten = false;
+                            break;
+                        }
+                    }
                 }
+                #endregion
+
+                AIfindWay();
             }
-            #endregion
 
             #region player_control
             if (TouchPanel.IsGestureAvailable)
@@ -307,31 +295,16 @@ namespace Snake
                 }
             }
             #endregion
-
-            Point AIHead = AI.HeadPosition;
-            if (contains[AIHead.X - 1, AIHead.Y] == Contain.empty || contains[AIHead.X - 1, AIHead.Y] == Contain.food)
-            {
-                AI.turn(Direction.Left);
-            }
-            else if (contains[AIHead.X + 1, AIHead.Y] == Contain.empty || contains[AIHead.X + 1, AIHead.Y] == Contain.food)
-            {
-                AI.turn(Direction.Right);
-            }
-            else if (contains[AIHead.X, AIHead.Y - 1] == Contain.empty || contains[AIHead.X - 1, AIHead.Y - 1] == Contain.food)
-            {
-                AI.turn(Direction.Up);
-            }
-            else if (contains[AIHead.X, AIHead.Y + 1] == Contain.empty || contains[AIHead.X - 1, AIHead.Y + 1] == Contain.food)
-            {
-                AI.turn(Direction.Down);
-            }
             
-
             base.Update(gameTime);
         }
 
         public override void Draw(GameTime gameTime)
         {
+            spriteBatch.Begin();
+            spriteBatch.Draw(img_background, new Vector2(0, 0), Color.White);
+            spriteBatch.End();
+
             player.Draw(gameTime, spriteBatch);
             AI.Draw(gameTime, spriteBatch);
             foreach (Stone s in stones)
@@ -343,13 +316,188 @@ namespace Snake
             {
                 f.Draw(gameTime, spriteBatch);
             }
-
-            up.Draw(gameTime, spriteBatch);
-            down.Draw(gameTime, spriteBatch);
-            left.Draw(gameTime, spriteBatch);
-            right.Draw(gameTime, spriteBatch);
             
             base.Draw(gameTime);
+        }
+
+        protected void AIfindWay()
+        {
+            Point AIHead = AI.HeadPosition;
+            Stack<Point> way = new Stack<Point>();
+
+            bool found = false;
+            bool[,] map;
+            map = new bool[sceneWidth, sceneHeight];
+            for (int i=0; i< sceneWidth; i++)
+                for (int j = 0; j < sceneHeight; j++)
+                {
+                    if (contains[i, j] == Contain.food || contains[i, j] == Contain.empty)
+                        map[i, j] = true;
+                    else
+                        map[i, j] = false;
+                }
+
+            way.Push(AIHead);
+            for (; ; )
+            {
+
+                Point top = way.Peek();
+
+                if (contains[top.X, top.Y] == Contain.food)
+                {
+                    found = true;
+                    break;
+                }
+
+                if (way.Count == 0)
+                {
+                    break;
+                }
+
+                int x,y;
+                if (food_position.X > top.X)
+                    x=1;
+                else
+                    x = -1;
+
+                if (food_position.Y > top.Y)
+                    y=1;
+                else if (food_position.Y < top.Y)
+                    y=-1;
+                else 
+                    y = 0;
+
+                //尝试各个方向，可行则压栈，不可行则出栈寻找新路
+                if (y == 0)
+                {
+                    y = 1;
+
+                    if (map[top.X + x, top.Y])
+                    {
+                        way.Push(new Point(top.X + x, top.Y));
+                        map[top.X + x, top.Y] = false;
+                        continue;
+                    }
+
+                    if (map[top.X, top.Y + y])
+                    {
+                        way.Push(new Point(top.X, top.Y + y));
+                        map[top.X, top.Y + y] = false;
+                        continue;
+                    }
+
+                    x *= -1;
+                    y *= -1;
+
+                    if (map[top.X + x, top.Y])
+                    {
+                        way.Push(new Point(top.X + x, top.Y));
+                        map[top.X + x, top.Y] = false;
+                        continue;
+                    }
+
+                    if (map[top.X, top.Y + y])
+                    {
+                        way.Push(new Point(top.X, top.Y + y));
+                        map[top.X, top.Y + y] = false;
+                        continue;
+                    }
+
+                    way.Pop();
+                }
+                else
+                {
+                    if (map[top.X, top.Y + y])
+                    {
+                        way.Push(new Point(top.X, top.Y + y));
+                        map[top.X, top.Y + y] = false;
+                        continue;
+                    }
+                    if (map[top.X + x, top.Y])
+                    {
+                        way.Push(new Point(top.X + x, top.Y));
+                        map[top.X + x, top.Y] = false;
+                        continue;
+                    }
+
+                    x *= -1;
+                    y *= -1;
+
+                    if (map[top.X, top.Y + y])
+                    {
+                        way.Push(new Point(top.X, top.Y + y));
+                        map[top.X, top.Y + y] = false;
+                        continue;
+                    }
+                    if (map[top.X + x, top.Y])
+                    {
+                        way.Push(new Point(top.X + x, top.Y));
+                        map[top.X + x, top.Y] = false;
+                        continue;
+                    }
+
+                    way.Pop();
+                }
+            }//end for
+
+            if (found && !food_eaten)
+            {
+
+                Point next = way.ElementAt<Point>(way.Count - 2);
+
+                Debug.WriteLine(next);               
+                Debug.WriteLine(AIHead);
+                Debug.WriteLine("---");
+                int x = next.X - AIHead.X;
+                int y = next.Y - AIHead.Y;
+
+                if (x == 0)
+                {
+                    if (y > 0)
+                    {
+                        Debug.WriteLine("turn");
+                        AI.turn(Direction.Down);
+                    }
+                    else
+                    {
+                        Debug.WriteLine("turn");
+                        AI.turn(Direction.Up);
+                    }
+                }
+                else if (y == 0)
+                {
+                    if (x > 0)
+                    {
+                        Debug.WriteLine("turn");
+                        AI.turn(Direction.Right);
+                    }
+                    else
+                    {
+                        Debug.WriteLine("turn");
+                        AI.turn(Direction.Left);
+                    }
+                }
+            }
+            else
+            {
+                //实际上这里是最初版本的AI移动代码
+                if (contains[AIHead.X - 1, AIHead.Y] == Contain.empty || contains[AIHead.X - 1, AIHead.Y] == Contain.food)
+                {
+                    AI.turn(Direction.Left);
+                }
+                else if (contains[AIHead.X + 1, AIHead.Y] == Contain.empty || contains[AIHead.X + 1, AIHead.Y] == Contain.food)
+                {
+                    AI.turn(Direction.Right);
+                }
+                else if (contains[AIHead.X, AIHead.Y - 1] == Contain.empty || contains[AIHead.X - 1, AIHead.Y - 1] == Contain.food)
+                {
+                    AI.turn(Direction.Up);
+                }
+                else if (contains[AIHead.X, AIHead.Y + 1] == Contain.empty || contains[AIHead.X - 1, AIHead.Y + 1] == Contain.food)
+                {
+                    AI.turn(Direction.Down);
+                }
+            }
         }
 
     }

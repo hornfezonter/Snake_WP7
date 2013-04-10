@@ -8,17 +8,17 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Snake
 {
-    public class Loose:DrawableGameComponent
+    public class Lose:DrawableGameComponent
     {
         SpriteBatch spriteBatch;
-        Texture2D loose;
+        Texture2D lose;
 
-        public Loose(Game game) : base(game) { }
+        public Lose(Game game) : base(game) { }
 
         protected override void LoadContent()
         {
             spriteBatch = new SpriteBatch(Game.GraphicsDevice);
-            loose = Game.Content.Load<Texture2D>(@"images/loose");
+            lose = Game.Content.Load<Texture2D>(@"images/lose");
 
             base.LoadContent();
         }
@@ -26,7 +26,7 @@ namespace Snake
         public override void Draw(GameTime gameTime)
         {
             spriteBatch.Begin();
-            spriteBatch.Draw(loose, new Vector2(100, 100), Color.White);
+            spriteBatch.Draw(lose, new Vector2(100, 100), Color.White);
             spriteBatch.End();
             base.Draw(gameTime);
         }
