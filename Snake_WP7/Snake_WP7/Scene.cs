@@ -329,8 +329,8 @@ namespace Snake
             spriteBatch.Draw(img_background, new Vector2(0, 0), Color.White);
             spriteBatch.DrawString(font, "PLAYER", new Vector2(660, 20), Color.White);
             spriteBatch.DrawString(font,""+ score_player, new Vector2(660, 60), Color.Red);
-            spriteBatch.DrawString(font, "AI", new Vector2(660, 220), Color.White);
-            spriteBatch.DrawString(font, ""+score_AI, new Vector2(660, 260), Color.Red);
+            spriteBatch.DrawString(font, "AI", new Vector2(660, 140), Color.White);
+            spriteBatch.DrawString(font, ""+score_AI, new Vector2(660, 180), Color.Red);
             spriteBatch.DrawString(font, "TIME", new Vector2(660,320), Color.White);
             spriteBatch.DrawString(font, ""+time, new Vector2(660,360), Color.Green);
             spriteBatch.End();
