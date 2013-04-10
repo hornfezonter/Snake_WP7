@@ -58,7 +58,7 @@ namespace Snake
         protected override void Initialize()
         {
             // TODO: 在此处添加初始化逻辑
-            TouchPanel.EnabledGestures = GestureType.VerticalDrag | GestureType.HorizontalDrag;
+            TouchPanel.EnabledGestures = GestureType.VerticalDrag | GestureType.HorizontalDrag | GestureType.Tap;
 
             currentState = GameState.main_menu;
             preState = GameState.main_menu;
@@ -147,7 +147,7 @@ namespace Snake
         /// <param name="gameTime">提供计时值的快照。</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.White);
+            GraphicsDevice.Clear(Color.SkyBlue);
 
             // TODO: 在此处添加绘图代码
 

@@ -35,6 +35,8 @@ namespace Snake
         protected Texture2D img_cornerBody;
         protected Texture2D img_tail;
 
+        protected SpriteFont font;
+
         //游戏进行时使用变量
         protected Contain[,] contains;
         protected bool[,] growPoints;
@@ -45,6 +47,7 @@ namespace Snake
         protected List<Food> foods;
         protected bool food_eaten;
         protected Point food_position;
+        protected int score_player, score_AI;
 
         protected Random rand;
 
@@ -64,6 +67,9 @@ namespace Snake
             foods = new List<Food>();
             food_position = new Point(1, 1);
             food_eaten = true;
+            score_AI = 0;
+            score_player = 0;
+
             timePerMove = 300;
             timeSinceLastMove = 0;
             rand = new Random();
@@ -81,11 +87,12 @@ namespace Snake
         {
             spriteBatch = new SpriteBatch(Game.GraphicsDevice);
 
+            font = Game.Content.Load<SpriteFont>(@"font");
             img_head = Game.Content.Load<Texture2D>(@"images/head");
             img_straightBody = Game.Content.Load<Texture2D>(@"images/straightBody");
             img_cornerBody = Game.Content.Load<Texture2D>(@"images/cornerBody");
             img_tail = Game.Content.Load<Texture2D>(@"images/tail");
-            img_food = Game.Content.Load<Texture2D>(@"images/objects/meat");
+            img_food = Game.Content.Load<Texture2D>(@"images/objects/apple");
             img_background = Game.Content.Load<Texture2D>(@"images/background");
             Texture2D img_wall = Game.Content.Load<Texture2D>(@"images/objects/wall");
 
@@ -129,10 +136,10 @@ namespace Snake
             #endregion
 
             #region 初始化蛇的位置
-            player = new Snake.Sprites.Snake(origin, new Point(3, 3), img_head, img_straightBody, img_cornerBody, img_tail);
-            contains[3, 3] = Contain.snake;
-            contains[3, 4] = Contain.snake;
-            contains[3, 5] = Contain.snake;
+            player = new Snake.Sprites.Snake(origin, new Point(3, 15), img_head, img_straightBody, img_cornerBody, img_tail);
+            contains[3, 15] = Contain.snake;
+            contains[3, 16] = Contain.snake;
+            contains[3, 17] = Contain.snake;
 
             img_head = Game.Content.Load<Texture2D>(@"images/AIhead");
             img_straightBody = Game.Content.Load<Texture2D>(@"images/AIstraightBody");
@@ -186,6 +193,7 @@ namespace Snake
                 {
                     AI.move(AIgrow);
                     contains[AInextPosition.X, AInextPosition.Y] = Contain.snake;
+                    score_AI += 50;
                     if (!AIgrow)
                     {
                         contains[AItailPosition.X, AItailPosition.Y] = Contain.empty;
@@ -226,6 +234,7 @@ namespace Snake
                 {
                     player.move(grow);
                     contains[nextPosition.X, nextPosition.Y] = Contain.snake;
+                    score_player += 50;
                     if (!grow)
                     {
                         contains[tailPosition.X, tailPosition.Y] = Contain.empty;
@@ -236,7 +245,7 @@ namespace Snake
                 }
                 else
                 {
-                    //((Game1)Game).currentState = Game1.GameState.lose;
+                    ((Game1)Game).currentState = Game1.GameState.lose;
                 }
                 #endregion
 
@@ -303,6 +312,10 @@ namespace Snake
         {
             spriteBatch.Begin();
             spriteBatch.Draw(img_background, new Vector2(0, 0), Color.White);
+            spriteBatch.DrawString(font, "PLAYER", new Vector2(660, 20), Color.White);
+            spriteBatch.DrawString(font,""+ score_player, new Vector2(660, 60), Color.Red);
+            spriteBatch.DrawString(font, "AI", new Vector2(660, 220), Color.White);
+            spriteBatch.DrawString(font, ""+score_AI, new Vector2(660, 260), Color.Red);
             spriteBatch.End();
 
             player.Draw(gameTime, spriteBatch);
@@ -445,9 +458,6 @@ namespace Snake
 
                 Point next = way.ElementAt<Point>(way.Count - 2);
 
-                Debug.WriteLine(next);               
-                Debug.WriteLine(AIHead);
-                Debug.WriteLine("---");
                 int x = next.X - AIHead.X;
                 int y = next.Y - AIHead.Y;
 
@@ -455,12 +465,10 @@ namespace Snake
                 {
                     if (y > 0)
                     {
-                        Debug.WriteLine("turn");
                         AI.turn(Direction.Down);
                     }
                     else
                     {
-                        Debug.WriteLine("turn");
                         AI.turn(Direction.Up);
                     }
                 }
@@ -468,12 +476,10 @@ namespace Snake
                 {
                     if (x > 0)
                     {
-                        Debug.WriteLine("turn");
                         AI.turn(Direction.Right);
                     }
                     else
                     {
-                        Debug.WriteLine("turn");
                         AI.turn(Direction.Left);
                     }
                 }

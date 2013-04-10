@@ -4,7 +4,6 @@ Content\images\AIstraightBody.xnb
 Content\images\AItail.xnb
 Content\images\cornerBody.xnb
 Content\images\head.xnb
-Content\images\loose.xnb
 Content\images\straightBody.xnb
 Content\images\tail.xnb
 Content\images\win.xnb
@@ -19,3 +18,6 @@ Content\images\buttons\left.xnb
 Content\images\buttons\right.xnb
 Content\images\buttons\up.xnb
 Content\images\background.xnb
+Content\images\lose.xnb
+Content\font.xnb
+Content\images\objects\apple.xnb
