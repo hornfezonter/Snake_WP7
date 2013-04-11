@@ -52,8 +52,10 @@ namespace Snake
         protected Random rand;
 
         //游戏可调整参数
-        protected int timePerMove;
-        protected int timeSinceLastMove;
+        protected int player_timePerMove;
+        protected int player_timeSinceLastMove;
+        protected int AI_timePerMove;
+        protected int AI_timeSinceLastMove;
         protected int sceneWidth;
         protected int sceneHeight;
         protected int time;
@@ -72,8 +74,10 @@ namespace Snake
             score_AI = 0;
             score_player = 0;
 
-            timePerMove = 300;
-            timeSinceLastMove = 0;
+            player_timePerMove = 300;
+            player_timeSinceLastMove = 0;
+            AI_timePerMove = 450;
+            AI_timeSinceLastMove = 0;
             rand = new Random();
 
             sceneHeight = 20;
@@ -178,12 +182,11 @@ namespace Snake
                 }
             }
 
-            timeSinceLastMove += gameTime.ElapsedGameTime.Milliseconds;
-            if (timeSinceLastMove >= timePerMove)
+            #region AI_move
+            AI_timeSinceLastMove += gameTime.ElapsedGameTime.Milliseconds;
+            if (AI_timeSinceLastMove >= AI_timePerMove)
             {
-                timeSinceLastMove = 0;
-
-                #region AI_move
+                AI_timeSinceLastMove = 0;
 
                 bool AIgrow = false;
 
@@ -220,11 +223,18 @@ namespace Snake
                 else
                 {
                     ((Game1)Game).currentState = Game1.GameState.win;
+                    ((Game1)Game).Lag = 300;
                 }
 
-                #endregion
+                generateFood();
+            }
+            #endregion
 
-                #region player_move
+            #region player_move
+            player_timeSinceLastMove += gameTime.ElapsedGameTime.Milliseconds;
+            if (player_timeSinceLastMove >= player_timePerMove)
+            {
+                player_timeSinceLastMove = 0;          
 
                 bool grow = false;
 
@@ -262,31 +272,12 @@ namespace Snake
                 {
                     ((Game1)Game).currentState = Game1.GameState.lose;
                 }
-                #endregion
-
-                #region generate food
-
-                if (food_eaten)
-                {
-                    for (; ; )
-                    {
-                        int roll = rand.Next(0, 400);
-
-                        if (contains[roll % sceneWidth, roll / sceneWidth] == Contain.empty)
-                        {
-                            contains[roll % sceneWidth, roll / sceneWidth] = Contain.food;
-                            food_position.X = roll % sceneWidth;
-                            food_position.Y = roll / sceneWidth;
-                            foods.Add(new Food(img_food, origin, food_position));
-                            food_eaten = false;
-                            break;
-                        }
-                    }
-                }
-                #endregion
-
+                
+                generateFood();
                 AIfindWay();
+
             }
+            #endregion
 
             #region player_control
             if (TouchPanel.IsGestureAvailable)
@@ -519,6 +510,27 @@ namespace Snake
                 else if (contains[AIHead.X, AIHead.Y + 1] == Contain.empty || contains[AIHead.X - 1, AIHead.Y + 1] == Contain.food)
                 {
                     AI.turn(Direction.Down);
+                }
+            }
+        }
+
+        protected void generateFood()
+        {
+            if (food_eaten)
+            {
+                for (; ; )
+                {
+                    int roll = rand.Next(0, 400);
+
+                    if (contains[roll % sceneWidth, roll / sceneWidth] == Contain.empty)
+                    {
+                        contains[roll % sceneWidth, roll / sceneWidth] = Contain.food;
+                        food_position.X = roll % sceneWidth;
+                        food_position.Y = roll / sceneWidth;
+                        foods.Add(new Food(img_food, origin, food_position));
+                        food_eaten = false;
+                        break;
+                    }
                 }
             }
         }

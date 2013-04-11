@@ -28,9 +28,10 @@ namespace Snake
         protected override void LoadContent()
         {
             //设置按钮的位置和图片
-            Texture2D img_start = Game.Content.Load<Texture2D>(@"images/buttons/start1");
-            Texture2D img_start_pushed = Game.Content.Load<Texture2D>(@"images/buttons/start2");
-            start = new Button(new Vector2(100, 90), img_start, img_start_pushed);
+            Texture2D img_start = Game.Content.Load<Texture2D>(@"images/buttons/snake1");
+            Texture2D img_start_pushed = Game.Content.Load<Texture2D>(@"images/buttons/snake2");
+            background = Game.Content.Load<Texture2D>(@"images/menu_background");
+            start = new Button(new Vector2(250, 70), img_start, img_start_pushed);
 
             base.LoadContent();
         }
@@ -46,6 +47,7 @@ namespace Snake
                         if (start.CheckPoint(gestures.Position))
                         {
                             ((Game1)Game).currentState = Game1.GameState.playing;
+                            ((Game1)Game).Lag = 500;
                         }
                 }
             }
@@ -54,6 +56,9 @@ namespace Snake
 
         public override void Draw(GameTime gameTime)
         {
+            spriteBatch.Begin();
+            spriteBatch.Draw(background, new Vector2(0, 0), Color.White);
+            spriteBatch.End();
             start.Draw(gameTime,spriteBatch);
 
             base.Draw(gameTime);

@@ -32,6 +32,15 @@ namespace Snake
 
         public GameState currentState;
         private GameState preState;
+        private int sceneChangeLag;
+
+        public int Lag
+        {
+            set
+            {
+                sceneChangeLag = value;
+            }
+        }      
 
         public Game1()
         {
@@ -62,6 +71,7 @@ namespace Snake
 
             currentState = GameState.main_menu;
             preState = GameState.main_menu;
+            sceneChangeLag = 0;
 
             Components.Clear();
             Menu menu = new Menu(this);
@@ -106,35 +116,39 @@ namespace Snake
             // TODO: 在此处添加更新逻辑
             if (currentState != preState)
             {
-                preState = currentState;
-                switch (currentState)
+                sceneChangeLag -= gameTime.ElapsedGameTime.Milliseconds;
+                if (sceneChangeLag <= 0)
                 {
-                    case GameState.main_menu:
-                        Components.Clear();
-                        Menu menu = new Menu(this);
-                        menu.Initialize();
-                        Components.Add(menu);
-                        break;
-                    case GameState.playing:
-                        Components.Clear();
-                        Scene scene = new Scene(this);
-                        scene.Initialize();
-                        Components.Add(scene);
-                        break;
-                    case GameState.lose:
-                        Components.Clear();
-                        Lose lose = new Lose(this);
-                        lose.Initialize();
-                        Components.Add(lose);
-                        break;
-                    case GameState.win:
-                        Components.Clear();
-                        Win win = new Win(this);
-                        win.Initialize();
-                        Components.Add(win);
-                        break;
-                    default:
-                        break;
+                    preState = currentState;
+                    switch (currentState)
+                    {
+                        case GameState.main_menu:
+                            Components.Clear();
+                            Menu menu = new Menu(this);
+                            menu.Initialize();
+                            Components.Add(menu);
+                            break;
+                        case GameState.playing:
+                            Components.Clear();
+                            Scene scene = new Scene(this);
+                            scene.Initialize();
+                            Components.Add(scene);
+                            break;
+                        case GameState.lose:
+                            Components.Clear();
+                            Lose lose = new Lose(this);
+                            lose.Initialize();
+                            Components.Add(lose);
+                            break;
+                        case GameState.win:
+                            Components.Clear();
+                            Win win = new Win(this);
+                            win.Initialize();
+                            Components.Add(win);
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
 
