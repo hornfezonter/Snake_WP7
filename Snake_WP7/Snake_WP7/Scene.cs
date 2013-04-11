@@ -100,7 +100,7 @@ namespace Snake
             img_straightBody = Game.Content.Load<Texture2D>(@"images/straightBody");
             img_cornerBody = Game.Content.Load<Texture2D>(@"images/cornerBody");
             img_tail = Game.Content.Load<Texture2D>(@"images/tail");
-            img_food = Game.Content.Load<Texture2D>(@"images/objects/apple");
+            img_food = Game.Content.Load<Texture2D>(@"images/objects/bug");
             img_background = Game.Content.Load<Texture2D>(@"images/background");
             Texture2D img_wall = Game.Content.Load<Texture2D>(@"images/objects/wall");
 
