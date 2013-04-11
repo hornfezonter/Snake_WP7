@@ -29,7 +29,7 @@ namespace Snake
             if (touchs.Count > 0)
             {
                 ((Game1)Game).currentState = Game1.GameState.main_menu;
-                ((Game1)Game).Lag = 300;
+                ((Game1)Game).Lag = 600;
             }
 
             base.Update(gameTime);
